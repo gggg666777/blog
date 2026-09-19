@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>内容管理</title>
+</head>
+<body>
+  <!--
+    CMS 脚本用的是本地副本（admin/sveltia-cms.js），刻意不依赖 CDN。
+    原因：unpkg / jsdelivr 在国内经常加载不出来，后台会白屏。
+
+    升级方式：
+      npm install --save-dev @sveltia/cms@latest
+      copy node_modules/@sveltia/cms/dist/sveltia-cms.js admin/sveltia-cms.js
+
+    想改用 Decap CMS（与 Sveltia 共用同一份 config.yml）：
+      npm install --save-dev decap-cms
+      copy node_modules/decap-cms/dist/decap-cms.js admin/decap-cms.js
+      再把下面这行的 src 换成 /admin/decap-cms.js
+  -->
+  <script src="/admin/sveltia-cms.js"></script>
+</body>
+</html>

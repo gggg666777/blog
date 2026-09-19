@@ -1,0 +1,89 @@
+# ============================================================
+#  可视化后台配置（Sveltia CMS / Decap CMS 通用）
+#
+#  上线前只剩 1 个 TODO 要填：
+#    repo —— 你的 用户名/仓库名
+#
+#  登录相关的不用改，已经配置好了（用网站自己的域名，由 functions/ 提供）
+# ============================================================
+
+backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/YOUR-REPO   # TODO: 改成 用户名/仓库名
+  branch: main
+  base_url: https://ysnb.store           # 登录接口跟着网站一起部署，无需单独配 Worker
+  auth_endpoint: auth                    # 对应 functions/auth.js
+  commit_messages:
+    create: "cms: 新建《{{slug}}》"
+    update: "cms: 更新《{{slug}}》"
+    delete: "cms: 删除《{{slug}}》"
+    uploadMedia: "cms: 上传图片 {{path}}"
+    deleteMedia: "cms: 删除图片 {{path}}"
+
+# 后台左上角显示
+site_url: https://ysnb.store
+display_url: https://ysnb.store
+
+# 媒体文件存放位置（相对于仓库根目录）
+media_folder: "src/images/uploads"
+public_folder: "/images/uploads"
+
+# 编辑器里可用的 Markdown 快捷键
+slug:
+  encoding: ascii        # 中文标题生成英文 slug，避免 URL 里出现中文
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: posts
+    label: 文章
+    label_singular: 文章
+    description: 博客文章，保存后会以 Markdown 提交到仓库
+    folder: "src/posts"
+    media_folder: ""
+    public_folder: ""
+    create: true
+    delete: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: "blog/{{fields.slug}}"
+    sortable_fields: ["date", "title"]
+    fields:
+      - label: 标题
+        name: title
+        widget: string
+
+      - label: 发布日期
+        name: date
+        widget: datetime
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        picker_utc: true
+
+      - label: 摘要
+        name: description
+        widget: text
+        required: false
+        hint: 会显示在文章列表和搜索引擎结果里，建议 50-120 字
+
+      - label: 标签
+        name: labels
+        widget: list
+        required: false
+        default: []
+        hint: 每行一个，或者用逗号分隔
+
+      - label: 封面图
+        name: cover
+        widget: image
+        required: false
+        choose_url: true
+
+      - label: 草稿
+        name: draft
+        widget: boolean
+        default: false
+        hint: 打开后本地预览可见，但不会发布到线上
+
+      - label: 正文
+        name: body
+        widget: markdown

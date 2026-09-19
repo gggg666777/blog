@@ -1,0 +1,21 @@
+---
+layout: base.njk
+title: 首页
+description: 全部文章
+permalink: /index.html
+---
+<h1 class="grad">最新文章</h1>
+
+{% if collections.posts.length == 0 %}
+  <p class="empty">还没有文章。打开 <a href="/admin/">/admin/</a> 写第一篇吧。</p>
+{% else %}
+  <ul class="post-list">
+    {% for post in collections.posts %}
+      <li>
+        <a class="post-list-title" href="{{ post.url }}">{{ post.data.title }}</a>
+        <time datetime="{{ post.date | isoDate }}">{{ post.date | readableDate }}</time>
+        {% if post.data.description %}<p>{{ post.data.description }}</p>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

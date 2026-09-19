@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>wzl66 游戏合集</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:微软雅黑;}
+        body{
+            background: linear-gradient(135deg,#667eea,#764ba2);
+            min-height:100vh;
+            padding:20px 10px;
+        }
+        h1{
+            text-align:center;color:#fff;
+            font-size:clamp(28px,6vw,42px);
+            margin-bottom:30px;
+            text-shadow:2px 2px 8px #0003;
+        }
+        .game-box{
+            max-width:900px;margin:0 auto;
+            display:grid;
+            grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+            gap:20px;
+        }
+        .game-item{
+            background:rgba(255,255,255,0.15);
+            backdrop-filter:blur(10px);
+            border-radius:16px;
+            text-align:center;
+            padding:30px 15px;
+            border:1px solid rgba(255,255,255,0.2);
+            color:#fff;
+            font-size:clamp(18px,4vw,22px);
+            font-weight:bold;
+            transition:0.3s;
+            cursor:pointer;
+        }
+        .game-item:active{
+            transform:scale(0.95);
+            background:rgba(255,255,255,0.25);
+        }
+        .game-page{
+            display:none;
+            text-align:center;
+            color:#fff;
+            padding:10px;
+        }
+        canvas{
+            background:#fff;
+            border-radius:10px;
+            width:90vw;
+            max-width:400px;
+            height:90vw;
+            max-height:400px;
+        }
+        .back-btn,.ctrl-btn{
+            margin-top:15px;
+            padding:12px 24px;
+            background:#fff;
+            color:#764ba2;
+            border:none;
+            border-radius:30px;
+            font-size:16px;
+            cursor:pointer;
+            touch-action:manipulation;
+        }
+        .ctrl-box{
+            display:flex;
+            justify-content:center;
+            gap:10px;
+            margin:15px 0;
+            flex-wrap:wrap;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width:90vw;
+            max-width:340px;
+            margin:20px auto;
+            background: #bbada0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .grid-cell {
+            aspect-ratio:1/1;
+            background: #cdc1b4;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size:clamp(16px,4vw,24px);
+            font-weight: bold;
+            color: #776e65;
+        }
+        /* 扫雷格子（修复后） */
+        .mine-grid{
+            display:grid;
+            grid-template-columns:repeat(10,1fr);
+            gap:2px;
+            width:90vw;
+            max-width:400px;
+            margin:20px auto;
+        }
+        .mine-cell{
+            aspect-ratio:1/1;
+            background:#ccc;
+            border-radius:3px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:bold;
+            font-size:18px; /* 放大字体 */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="home">
+        <h1>🎮 wzl123 游戏合集 🎮</h1>
+        <div class="game-box">
+            <div class="game-item" onclick="openGame('snake')">贪吃蛇</div>
+            <div class="game-item" onclick="openGame('2048')">2048</div>
+            <div class="game-item" onclick="openGame('brick')">打砖块</div>
+            <div class="game-item" onclick="openGame('tetris')">俄罗斯方块</div>
+            <div class="game-item" onclick="openGame('gobang')">五子棋</div>
+            <div class="game-item" onclick="openGame('plane')">飞机大战</div>
+            <div class="game-item" onclick="openGame('xiaoxiaole')">消消乐</div>
+            <div class="game-item" onclick="openGame('mine')">扫雷</div>
+            <div class="game-item" onclick="openGame('jump')">跳一跳</div>
+            <div class="game-item" onclick="openGame('race')">赛车</div>
+        </div>
+    </div>
+
+    <!-- 贪吃蛇 -->
+    <div id="snake" class="game-page">
+        <h2>贪吃蛇</h2>
+        <canvas id="g1" width="400" height="400"></canvas>
+        <div class="ctrl-box">
+            <button class="ctrl-btn" ontouchstart="setDir('up')">↑</button>
+        </div>
+        <div class="ctrl-box">
+            <button class="ctrl-btn" ontouchstart="setDir('left')">←</button>
+            <button class="ctrl-btn" ontouchstart="setDir('down')">↓</button>
+            <button class="ctrl-btn" ontouchstart="setDir('right')">→</button>
+        </div>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+    <!-- 2048 -->
+    <div id="2048" class="game-page">
+        <h2>2048</h2>
+        <div class="grid-container" id="gridContainer"></div>
+        <p>得分: <span id="score">0</span></p>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+    <!-- 打砖块 -->
+    <div id="brick" class="game-page">
+        <h2>打砖块</h2>
+        <canvas id="g3" width="400" height="400"></canvas>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+    <!-- 俄罗斯方块 -->
+    <div id="tetris" class="game-page">
+        <h2>俄罗斯方块</h2>
+        <canvas id="g4" width="400" height="400"></canvas>
+        <div class="ctrl-box">
+            <button class="ctrl-btn" ontouchstart="tetrisKey('left')">←</button>
+            <button class="ctrl-btn" ontouchstart="tetrisKey('right')">→</button>
+            <button class="ctrl-btn" ontouchstart="tetrisKey('down')">↓</button>
+            <button class="ctrl-btn" ontouchstart="tetrisKey('rotate')">旋转</button>
+        </div>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+    <!-- 五子棋 -->
+    <div id="gobang" class="game-page">
+        <h2>五子棋</h2>
+        <canvas id="g5" width="400" height="400"></canvas>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+    <!-- 飞机大战 -->
+    <div id="plane" class="game-page">
+        <h2>飞机大战</h2>
+        <canvas id="g6" width="400" height="400"></canvas>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+    <!-- 消消乐 -->
+    <div id="xiaoxiaole" class="game-page">
+        <h2>消消乐</h2>
+        <canvas id="g7" width="400" height="400"></canvas>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+    <!-- 扫雷（修复后） -->
+    <div id="mine" class="game-page">
+        <h2>扫雷</h2>
+        <div class="mine-grid" id="mineGrid"></div>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+    <!-- 跳一跳（修复：电脑鼠标/空格+手机触摸） -->
+    <div id="jump" class="game-page">
+        <h2>跳一跳</h2>
+        <canvas id="g8" width="400" height="400"></canvas>
+        <p style="margin-top:10px;">电脑：鼠标点击/空格键 蓄力；手机：按住屏幕蓄力</p>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+    <!-- 赛车（修复：电脑方向键+手机低灵敏度） -->
+    <div id="race" class="game-page">
+        <h2>赛车游戏</h2>
+        <canvas id="g9" width="400" height="400"></canvas>
+        <div class="ctrl-box">
+            <button class="ctrl-btn" ontouchstart="raceCtrl('left')">←</button>
+            <button class="ctrl-btn" ontouchstart="raceCtrl('right')">→</button>
+        </div>
+        <p style="margin-top:10px;">电脑：← → 方向键；手机：低灵敏度滑动</p>
+        <br>
+        <button class="back-btn" onclick="backHome()">返回主页</button>
+    </div>
+
+
+<script>
+let gameInterval = {};
+function clearAllGame(){
+    for(let k in gameInterval) clearInterval(gameInterval[k]);
+}
+function openGame(id){
+    clearAllGame();
+    document.getElementById('home').style.display='none';
+    document.querySelectorAll('.game-page').forEach(el=>el.style.display='none');
+    document.getElementById(id).style.display='block';
+    if(id === 'snake') initSnake();
+    if(id === '2048') init2048();
+    if(id === 'brick') initBrick();
+    if(id === 'tetris') initTetris();
+    if(id === 'gobang') initGobang();
+    if(id === 'plane') initPlane();
+    if(id === 'xiaoxiaole') initXiaoXiaoLe();
+    if(id === 'mine') initMine();
+    if(id === 'jump') initJump();
+    if(id === 'race') initRace();
+}
+function backHome(){
+    clearAllGame();
+    document.querySelectorAll('.game-page').forEach(el=>el.style.display='none');
+    document.getElementById('home').style.display='block';
+}
+
+// 贪吃蛇
+let snakeDir="right";
+function setDir(d){
+    if(d==="up"&&snakeDir!="down") snakeDir="up";
+    if(d==="down"&&snakeDir!="up") snakeDir="down";
+    if(d==="left"&&snakeDir!="right") snakeDir="left";
+    if(d==="right"&&snakeDir!="left") snakeDir="right";
+}
+function initSnake(){
+    const canvas=document.getElementById("g1");
+    const ctx=canvas.getContext("2d");
+    let snake=[{x:10,y:10}];
+    snakeDir="right";
+    let food={x:15,y:15};
+    const s=20;
+    document.onkeydown=e=>setDir(e.key.replace('Arrow','').toLowerCase());
+    let touchStartX=0,touchStartY=0;
+    canvas.addEventListener('touchstart',e=>{
+        touchStartX=e.touches[0].clientX;
+        touchStartY=e.touches[0].clientY;
+    });
+    canvas.addEventListener('touchend',e=>{
+        const dx=e.changedTouches[0].clientX-touchStartX;
+        const dy=e.changedTouches[0].clientY-touchStartY;
+        Math.abs(dx)>Math.abs(dy) ? setDir(dx>0?'right':'left') : setDir(dy>0?'down':'up');
+    });
+    function draw(){
+        let h={...snake[0]};
+        if(snakeDir=="up")h.y--;
+        if(snakeDir=="down")h.y++;
+        if(snakeDir=="left")h.x--;
+        if(snakeDir=="right")h.x++;
+        if(h.x<0||h.x>=20||h.y<0||h.y>=20||snake.some(p=>p.x==h.x&&p.y==h.y)){
+            snake=[{x:10,y:10}];snakeDir="right";
+        }else{
+            snake.unshift(h);
+            if(h.x==food.x&&h.y==food.y) food={x:Math.floor(Math.random()*20),y:Math.floor(Math.random()*20)};
+            else snake.pop();
+        }
+        ctx.fillStyle="#fff";ctx.fillRect(0,0,400,400);
+        ctx.fillStyle="#4CAF50";snake.forEach(p=>ctx.fillRect(p.x*s,p.y*s,s-2,s-2));
+        ctx.fillStyle="#f44336";ctx.fillRect(food.x*s,food.y*s,s-2,s-2);
+    }
+    gameInterval.snake = setInterval(draw,120);
+}
+
+// 2048
+function init2048(){
+    const gridContainer = document.getElementById('gridContainer');
+    const scoreElement = document.getElementById('score');
+    let grid = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    let score = 0;
+    function drawGrid(){
+        gridContainer.innerHTML='';
+        for(let i=0;i<4;i++)for(let j=0;j<4;j++){
+            let cell=document.createElement('div');
+            cell.className='grid-cell';
+            let v=grid[i][j];
+            cell.textContent=v?v:'';
+            cell.style.background=v?getColor(v):'#cdc1b4';
+            gridContainer.appendChild(cell);
+        }
+        scoreElement.textContent=score;
+    }
+    function getColor(v){
+        let c={2:'#eee4da',4:'#ede0c8',8:'#f2b179',16:'#f59563',32:'#f67c5f',64:'#f65e3b',128:'#edcf72',256:'#edcc61',512:'#edc850',1024:'#edc53f',2048:'#edc22e'};
+        return c[v]||'#3c3a32';
+    }
+    function addRand(){
+        let arr=[];
+        for(let i=0;i<4;i++)for(let j=0;j<4;j++)if(grid[i][j]===0)arr.push({i,j});
+        if(arr.length){let p=arr[Math.floor(Math.random()*arr.length)];grid[p.i][p.j]=Math.random()<0.9?2:4;}
+    }
+    function moveLeft(){
+        for(let i=0;i<4;i++){
+            let r=grid[i].filter(x=>x);
+            for(let j=0;j<r.length-1;j++)if(r[j]===r[j+1]){r[j]*=2;score+=r[j];r.splice(j+1,1);}
+            while(r.length<4)r.push(0);grid[i]=r;
+        }
+    }
+    function rotate(){
+        let ng=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+        for(let i=0;i<4;i++)for(let j=0;j<4;j++)ng[i][j]=grid[3-j][i];
+        grid=ng;
+    }
+    function move(d){
+        if(d==='left')moveLeft();
+        if(d==='right'){rotate();rotate();moveLeft();rotate();rotate();}
+        if(d==='up'){rotate();rotate();rotate();moveLeft();}
+        if(d==='down'){rotate();moveLeft();rotate();rotate();rotate();}
+        addRand();drawGrid();
+    }
+    document.onkeydown=e=>{
+        if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) move(e.key.replace('Arrow','').toLowerCase());
+    };
+    let tx=0,ty=0;
+    gridContainer.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;});
+    gridContainer.addEventListener('touchend',e=>{
+        let dx=e.changedTouches[0].clientX-tx;
+        let dy=e.changedTouches[0].clientY-ty;
+        Math.abs(dx)>Math.abs(dy) ? move(dx>0?'right':'left') : move(dy>0?'down':'up');
+    });
+    grid=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];score=0;addRand();addRand();drawGrid();
+}
+
+// 打砖块
+function initBrick(){
+    const canvas=document.getElementById('g3');
+    const ctx=canvas.getContext('2d');
+    let ball={x:200,y:300,dx:2,dy:-2,radius:10};
+    let paddle={w:100,h:10,x:150,y:380};
+    let bricks=[];
+    for(let i=0;i<5;i++){bricks[i]=[];for(let j=0;j<5;j++)bricks[i][j]={x:j*80+10,y:i*20+10,w:70,h:15,live:true};}
+    document.onkeydown=e=>{
+        if(e.key==='ArrowLeft'&&paddle.x>0)paddle.x-=15;
+        if(e.key==='ArrowRight'&&paddle.x<400-paddle.w)paddle.x+=15;
+    };
+    canvas.addEventListener('touchmove',e=>{
+        e.preventDefault();
+        let rect=canvas.getBoundingClientRect();
+        let x=e.touches[0].clientX-rect.left;
+        paddle.x=x-paddle.w/2;
+        if(paddle.x<0)paddle.x=0;
+        if(paddle.x>400-paddle.w)paddle.x=400-paddle.w;
+    });
+    function draw(){
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,400,400);
+        ctx.fillStyle='#333';ctx.fillRect(paddle.x,paddle.y,paddle.w,paddle.h);
+        ctx.beginPath();ctx.arc(ball.x,ball.y,ball.radius,0,Math.PI*2);ctx.fill();
+        for(let i=0;i<5;i++)for(let j=0;j<5;j++){
+            let b=bricks[i][j];
+            if(b.live){
+                ctx.fillStyle='#ff6b6b';ctx.fillRect(b.x,b.y,b.w,b.h);
+                if(ball.x>b.x&&ball.x<b.x+b.w&&ball.y>b.y&&ball.y<b.y+b.h){b.live=false;ball.dy=-ball.dy;}
+            }
+        }
+        ball.x+=ball.dx;ball.y+=ball.dy;
+        if(ball.x<0||ball.x>400)ball.dx=-ball.dx;
+        if(ball.y<0)ball.dy=-ball.dy;
+        if(ball.y>paddle.y&&ball.y<paddle.y+paddle.h&&ball.x>paddle.x&&ball.x<paddle.x+paddle.w)ball.dy=-ball.dy;
+        if(ball.y>400)ball={x:200,y:300,dx:2,dy:-2,radius:10};
+    }
+    gameInterval.brick=setInterval(draw,16);
+}
+
+// 俄罗斯方块
+let tetrisCtrl;
+function tetrisKey(k){tetrisCtrl=k;}
+function initTetris(){
+    const canvas=document.getElementById('g4');
+    const ctx=canvas.getContext('2d');
+    const row=20,col=10,sz=20;
+    let map=Array(row).fill().map(()=>Array(col).fill(0));
+    let shape=[[[1,1,1,1]],[[1,1],[1,1]],[[1,1,1],[0,1,0]],[[1,1,1],[1,0,0]],[[1,1,1],[0,0,1]],[[1,1],[0,1],[0,1]],[[0,1],[0,1],[1,1]]];
+    let now,sx=3,sy=0;
+    function newShape(){
+        let idx=Math.floor(Math.random()*shape.length);
+        now=shape[idx];sx=3;sy=0;
+    }
+    newShape();
+    function check(offx,offy,ns=now){
+        for(let i=0;i<ns.length;i++)for(let j=0;j<ns[i].length;j++){
+            if(ns[i][j]){
+                let x=sx+j+offx,y=sy+i+offy;
+                if(x<0||x>=col||y>=row||(y>=0&&map[y][x])) return false;
+            }
+        }
+        return true;
+    }
+    function fix(){
+        for(let i=0;i<now.length;i++)for(let j=0;j<now[i].length;j++){
+            if(now[i][j])map[sy+i][sx+j]=1;
+        }
+        for(let i=row-1;i>=0;i--){
+            if(map[i].every(v=>v)){
+                map.splice(i,1);
+                map.unshift(Array(col).fill(0));
+            }
+        }
+        newShape();
+    }
+    function rotate(){
+        let ns=[];
+        for(let j=0;j<now[0].length;j++){
+            let r=[];
+            for(let i=now.length-1;i>=0;i--)r.push(now[i][j]);
+            ns.push(r);
+        }
+        if(check(0,0,ns)) now=ns;
+    }
+    document.onkeydown=e=>{
+        if(e.key==='ArrowLeft')if(check(-1,0))sx--;
+        if(e.key==='ArrowRight')if(check(1,0))sx++;
+        if(e.key==='ArrowDown')if(check(0,1))sy++;
+        if(e.key==='ArrowUp')rotate();
+    };
+    tetrisCtrl='';
+    setInterval(()=>{
+        if(tetrisCtrl==='left'&&check(-1,0))sx--;
+        if(tetrisCtrl==='right'&&check(1,0))sx++;
+        if(tetrisCtrl==='down'&&check(0,1))sy++;
+        if(tetrisCtrl==='rotate')rotate();
+        tetrisCtrl='';
+    },150);
+    function draw(){
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,col*sz,row*sz);
+        for(let i=0;i<row;i++)for(let j=0;j<col;j++){
+            if(map[i][j]){ctx.fillStyle='#667eea';ctx.fillRect(j*sz,i*sz,sz-1,sz-1);}
+        }
+        for(let i=0;i<now.length;i++)for(let j=0;j<now[i].length;j++){
+            if(now[i][j]){ctx.fillStyle='#764ba2';ctx.fillRect((sx+j)*sz,(sy+i)*sz,sz-1,sz-1);}
+        }
+        if(!check(0,1))fix();else sy++;
+    }
+    gameInterval.tetris=setInterval(draw,400);
+}
+
+// 五子棋
+function initGobang(){
+    const canvas=document.getElementById('g5');
+    const ctx=canvas.getContext('2d');
+    const sz=20,n=15;
+    let board=Array(n).fill().map(()=>Array(n).fill(0));
+    let turn=1;
+    function draw(){
+        ctx.fillStyle='#deb887';ctx.fillRect(0,0,n*sz,n*sz);
+        ctx.strokeStyle='#333';
+        for(let i=0;i<=n;i++){
+            ctx.beginPath();ctx.moveTo(i*sz,0);ctx.lineTo(i*sz,n*sz);ctx.stroke();
+            ctx.beginPath();ctx.moveTo(0,i*sz);ctx.lineTo(n*sz,i*sz);ctx.stroke();
+        }
+        for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+            if(board[i][j]){
+                ctx.beginPath();ctx.arc(j*sz+sz/2,i*sz+sz/2,sz/2-2,0,Math.PI*2);
+                ctx.fillStyle=board[i][j]===1?'#000':'#fff';ctx.fill();
+                ctx.strokeStyle='#333';ctx.stroke();
+            }
+        }
+    }
+    function win(x,y,p){
+        let cnt=0;
+        for(let j=0;j<n;j++)for(let i=0;i<n;i++){
+            if(i+4<n&&board[i][j]===p&&board[i+1][j]===p&&board[i+2][j]===p&&board[i+3][j]===p&&board[i+4][j]===p)return true;
+            if(j+4<n&&board[i][j]===p&&board[i][j+1]===p&&board[i][j+2]===p&&board[i][j+3]===p&&board[i][j+4]===p)return true;
+            if(i+4<n&&j+4<n&&board[i][j]===p&&board[i+1][j+1]===p&&board[i+2][j+2]===p&&board[i+3][j+3]===p&&board[i+4][j+4]===p)return true;
+            if(i+4<n&&j-4>=0&&board[i][j]===p&&board[i+1][j-1]===p&&board[i+2][j-2]===p&&board[i+3][j-3]===p&&board[i+4][j-4]===p)return true;
+        }
+        return false;
+    }
+    canvas.addEventListener('click',e=>{
+        let rect=canvas.getBoundingClientRect();
+        let x=Math.floor((e.clientX-rect.left)/sz);
+        let y=Math.floor((e.clientY-rect.top)/sz);
+        if(x>=0&&x<n&&y>=0&&y<n&&!board[y][x]){
+            board[y][x]=turn;
+            if(win(y,x,turn)){alert(turn===1?'黑棋获胜':'白棋获胜');board=Array(n).fill().map(()=>Array(n).fill(0));}
+            turn=3-turn;
+        }
+    });
+    canvas.addEventListener('touchstart',e=>{
+        e.preventDefault();
+        let rect=canvas.getBoundingClientRect();
+        let t=e.touches[0];
+        let x=Math.floor((t.clientX-rect.left)/sz);
+        let y=Math.floor((t.clientY-rect.top)/sz);
+        if(x>=0&&x<n&&y>=0&&y<n&&!board[y][x]){
+            board[y][x]=turn;
+            if(win(y,x,turn)){alert(turn===1?'黑棋获胜':'白棋获胜');board=Array(n).fill().map(()=>Array(n).fill(0));}
+            turn=3-turn;
+        }
+    });
+    draw();
+    gameInterval.gobang=setInterval(draw,50);
+}
+
+// 飞机大战
+function initPlane(){
+    const canvas=document.getElementById('g6');
+    const ctx=canvas.getContext('2d');
+    let plane={x:180,y:350,w:40,h:40};
+    let bullets=[];
+    let enemies=[];
+    document.onkeydown=e=>{
+        if(e.key==='ArrowLeft')plane.x-=20;
+        if(e.key==='ArrowRight')plane.x+=20;
+        if(e.key===' ')bullets.push({x:plane.x+20,y:plane.y});
+    };
+    canvas.addEventListener('touchmove',e=>{
+        e.preventDefault();
+        let rect=canvas.getBoundingClientRect();
+        let x=e.touches[0].clientX-rect.left;
+        plane.x=x-plane.w/2;
+        if(plane.x<0)plane.x=0;
+        if(plane.x>400-plane.w)plane.x=400-plane.w;
+    });
+    setInterval(()=>{
+        enemies.push({x:Math.random()*360,y:0,w:40,h:40});
+    },800);
+    function draw(){
+        ctx.fillStyle='#111';ctx.fillRect(0,0,400,400);
+        ctx.fillStyle='#0f0';ctx.fillRect(plane.x,plane.y,plane.w,plane.h);
+        bullets.forEach((b,i)=>{
+            b.y-=6;
+            ctx.fillStyle='#ff0';ctx.fillRect(b.x,b.y,4,15);
+            if(b.y<0)bullets.splice(i,1);
+        });
+        enemies.forEach((e,ei)=>{
+            e.y+=3;
+            ctx.fillStyle='#f00';ctx.fillRect(e.x,e.y,e.w,e.h);
+            if(e.y>400)enemies.splice(ei,1);
+            bullets.forEach((b,bi)=>{
+                if(b.x>e.x&&b.x<e.x+e.w&&b.y>e.y&&b.y<e.y+e.h){
+                    enemies.splice(ei,1);bullets.splice(bi,1);
+                }
+            });
+        });
+    }
+    gameInterval.plane=setInterval(draw,16);
+}
+
+// 消消乐
+function initXiaoXiaoLe(){
+    const canvas=document.getElementById('g7');
+    const ctx=canvas.getContext('2d');
+    const size=50;
+    const row=8,col=8;
+    let arr=[];
+    let colorList=['#ff6b6b','#4ecdc4','#ffe066','#95e1d3','#f38181'];
+    let select=null;
+
+    for(let i=0;i<row;i++){
+        arr[i]=[];
+        for(let j=0;j<col;j++){
+            arr[i][j]=Math.floor(Math.random()*colorList.length);
+        }
+    }
+    canvas.onclick=e=>{
+        let rect=canvas.getBoundingClientRect();
+        let x=Math.floor((e.clientX-rect.left)/size);
+        let y=Math.floor((e.clientY-rect.top)/size);
+        if(!select){
+            select={x,y};
+        }else{
+            let dx=Math.abs(select.x-x);
+            let dy=Math.abs(select.y-y);
+            if((dx===1&&dy===0)||(dx===0&&dy===1)){
+                [arr[select.y][select.x],arr[y][x]]=[arr[y][x],arr[select.y][select.x]];
+            }
+            select=null;
+        }
+    };
+    function draw(){
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,400,400);
+        for(let i=0;i<row;i++){
+            for(let j=0;j<col;j++){
+                ctx.fillStyle=colorList[arr[i][j]];
+                ctx.fillRect(j*size,i*size,size-2,size-2);
+            }
+        }
+    }
+    gameInterval.xiaoxiaole=setInterval(draw,30);
+}
+
+// 扫雷（修复后）
+function initMine(){
+    const wrap=document.getElementById('mineGrid');
+    wrap.innerHTML='';
+    const row=10,col=10,mineNum=15;
+    let map=Array(row).fill().map(()=>Array(col).fill(0));
+    let isOpen=Array(row).fill().map(()=>Array(col).fill(false));
+
+    // 数字颜色（经典扫雷配色）
+    const numColor={
+        1:'blue',
+        2:'green',
+        3:'red',
+        4:'darkblue',
+        5:'brown',
+        6:'teal',
+        7:'black',
+        8:'gray'
+    };
+
+    // 随机放雷
+    let cnt=0;
+    while(cnt<mineNum){
+        let r=Math.floor(Math.random()*row);
+        let c=Math.floor(Math.random()*col);
+        if(map[r][c]!=-1){
+            map[r][c]=-1;
+            cnt++;
+        }
+    }
+    // 计算数字
+    for(let i=0;i<row;i++){
+        for(let j=0;j<col;j++){
+            if(map[i][j]===-1)continue;
+            let num=0;
+            for(let di=-1;di<=1;di++){
+                for(let dj=-1;dj<=1;dj++){
+                    let ni=i+di,nj=j+dj;
+                    if(ni>=0&&ni<row&&nj>=0&&nj<col&&map[ni][nj]===-1)num++;
+                }
+            }
+            map[i][j]=num;
+        }
+    }
+    // 渲染格子
+    for(let i=0;i<row;i++){
+        for(let j=0;j<col;j++){
+            let cell=document.createElement('div');
+            cell.className='mine-cell';
+            cell.dataset.i=i;cell.dataset.j=j;
+            cell.onclick=()=>{
+                let x=parseInt(cell.dataset.i);
+                let y=parseInt(cell.dataset.j);
+                if(isOpen[x][y])return;
+                isOpen[x][y]=true;
+                if(map[x][y]===-1){
+                    alert('踩到地雷，游戏结束');
+                    initMine();
+                    return;
+                }
+                cell.textContent=map[x][y]||'';
+                cell.style.background='#eee';
+                // 设置数字颜色
+                if(map[x][y]>0)cell.style.color=numColor[map[x][y]];
+            };
+            wrap.appendChild(cell);
+        }
+    }
+}
+
+// 跳一跳（修复：电脑鼠标/空格+手机触摸）
+function initJump(){
+    const canvas=document.getElementById('g8');
+    const ctx=canvas.getContext('2d');
+    let player={x:50,y:300,r:15};
+    let plat=[{x:200,y:350,w:80,h:20}];
+    let isJump=false,vy=0,power=0,powerUp=false;
+
+    // 电脑：鼠标按下蓄力、松开跳跃
+    canvas.onmousedown=()=>{if(!isJump){powerUp=true;power=0;}};
+    canvas.onmouseup=()=>{
+        if(powerUp&&!isJump){
+            isJump=true;
+            vy=-8-power/10;
+            powerUp=false;
+        }
+    };
+    // 电脑：空格键蓄力/跳跃
+    document.onkeydown=e=>{
+        if(e.key===' '&&!isJump){powerUp=true;power=0;}
+    };
+    document.onkeyup=e=>{
+        if(e.key===' '&&powerUp&&!isJump){
+            isJump=true;
+            vy=-8-power/10;
+            powerUp=false;
+        }
+    };
+    // 手机：触摸
+    canvas.ontouchstart=e=>{e.preventDefault();if(!isJump){powerUp=true;power=0;}};
+    canvas.ontouchend=e=>{
+        e.preventDefault();
+        if(powerUp&&!isJump){
+            isJump=true;
+            vy=-8-power/10;
+            powerUp=false;
+        }
+    };
+
+    function draw(){
+        ctx.fillStyle='#f5f5f5';ctx.fillRect(0,0,400,400);
+        // 平台
+        ctx.fillStyle='#764ba2';
+        plat.forEach(p=>ctx.fillRect(p.x,p.y,p.w,p.h));
+        // 小人
+        ctx.beginPath();
+        ctx.arc(player.x,player.y,player.r,0,Math.PI*2);
+        ctx.fillStyle='#667eea';
+        ctx.fill();
+        // 蓄力条
+        if(powerUp){
+            power+=2;
+            ctx.fillStyle='#ff6b6b';
+            ctx.fillRect(10,380,power,10);
+        }
+
+        if(isJump){
+            vy+=0.3;
+            player.y+=vy;
+            player.x+=2; // 向前跳
+            if(player.y>=300){
+                player.y=300;
+                isJump=false;vy=0;
+                // 新平台
+                plat.push({x:Math.random()*250+50,y:350,w:60,h:20});
+            }
+        }
+    }
+    gameInterval.jump=setInterval(draw,16);
+}
+
+// 赛车（修复：电脑方向键+手机低灵敏度）
+let raceDir='';
+let lastTouchX=null;
+const RACE_SPEED=2; // 降低灵敏度
+function raceCtrl(d){raceDir=d;}
+function initRace(){
+    const canvas=document.getElementById('g9');
+    const ctx=canvas.getContext('2d');
+    let car={x:180,y:320,w:40,h:60};
+    let enemyCar=[];
+
+    // 电脑：方向键
+    document.onkeydown=e=>{
+        if(e.key==='ArrowLeft') car.x-=RACE_SPEED*5;
+        if(e.key==='ArrowRight') car.x+=RACE_SPEED*5;
+    };
+    // 手机：低灵敏度滑动
+    canvas.addEventListener('touchstart',e=>{
+        lastTouchX=e.touches[0].clientX;
+    });
+    canvas.addEventListener('touchmove',e=>{
+        e.preventDefault();
+        if(lastTouchX===null)return;
+        let dx=e.touches[0].clientX-lastTouchX;
+        car.x+=dx*RACE_SPEED*0.3; // 低灵敏度
+        lastTouchX=e.touches[0].clientX;
+    });
+    canvas.addEventListener('touchend',()=>{lastTouchX=null;});
+
+    function draw(){
+        ctx.fillStyle='#333';ctx.fillRect(0,0,400,400);
+        // 车道线
+        ctx.fillStyle='#fff';
+        for(let i=0;i<10;i++)ctx.fillRect(195,i*50,10,20);
+
+        // 限制车左右边界
+        if(car.x<20)car.x=20;
+        if(car.x>340)car.x=340;
+
+        // 我方车
+        ctx.fillStyle='#0f0';
+        ctx.fillRect(car.x,car.y,car.w,car.h);
+
+        // 按钮控制（备用）
+        if(raceDir==='left'&&car.x>20) car.x-=RACE_SPEED*5;
+        if(raceDir==='right'&&car.x<340) car.x+=RACE_SPEED*5;
+        raceDir='';
+
+        // 随机敌方车
+        if(Math.random()<0.02){
+            enemyCar.push({x:Math.random()*300+20,y:-60,w:40,h:60});
+        }
+        enemyCar.forEach((e,i)=>{
+            e.y+=4;
+            ctx.fillStyle='#f00';
+            ctx.fillRect(e.x,e.y,e.w,e.h);
+            if(e.y>400) enemyCar.splice(i,1);
+            // 碰撞
+            if(car.x<e.x+e.w&&car.x+car.w>e.x&&car.y<e.y+e.h&&car.y+car.h>e.y){
+                alert('撞车了！重新开始');
+                enemyCar=[];car.x=180;
+            }
+        });
+    }
+    gameInterval.race=setInterval(draw,16);
+}
+
+</script>
+
+</body>
+</html>

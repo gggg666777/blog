@@ -1,0 +1,9 @@
+node_modules/
+_site/
+.eleventy-cache/
+.npm-cache/
+.tools/
+.DS_Store
+*.log
+.env
+.wrangler/

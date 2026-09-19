@@ -1,0 +1,17 @@
+{
+  "name": "my-site-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "给纯静态站点加一个带可视化后台的 Markdown 博客",
+  "scripts": {
+    "dev": "eleventy --serve --port=8080",
+    "build": "eleventy",
+    "dev:drafts": "node scripts/dev-drafts.js",
+    "cms": "decap-server"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0",
+    "@sveltia/cms": "^0.216.0"
+  }
+}

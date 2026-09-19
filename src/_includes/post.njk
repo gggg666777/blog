@@ -1,0 +1,26 @@
+---
+layout: base.njk
+---
+<article class="post">
+  <header class="post-header">
+    <h1>{{ title }}</h1>
+    <p class="post-meta">
+      <time datetime="{{ date | isoDate }}">{{ date | readableDate }}</time>
+      {% if labels and labels.length %}
+        <span class="post-labels">
+          {% for label in labels %}<span class="label">{{ label }}</span>{% endfor %}
+        </span>
+      {% endif %}
+    </p>
+  </header>
+
+  {% if draft %}<p class="draft-banner">草稿（未发布）</p>{% endif %}
+
+  <div class="post-body">
+    {{ content | safe }}
+  </div>
+
+  <footer class="post-footer">
+    <a href="/">← 返回文章列表</a>
+  </footer>
+</article>
