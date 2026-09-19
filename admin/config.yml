@@ -1,15 +1,14 @@
 # ============================================================
 #  可视化后台配置（Sveltia CMS / Decap CMS 通用）
 #
-#  上线前只剩 1 个 TODO 要填：
-#    repo —— 你的 用户名/仓库名
-#
-#  登录相关的不用改，已经配置好了（用网站自己的域名，由 functions/ 提供）
+#  配置已填好，没有 TODO 了。
+#  提交目标仓库：gggg666777/blog
+#  登录地址：https://ysnb.store（由 functions/ 提供）
 # ============================================================
 
 backend:
   name: github
-  repo: YOUR-GITHUB-USERNAME/YOUR-REPO   # TODO: 改成 用户名/仓库名
+  repo: gggg666777/blog
   branch: main
   base_url: https://ysnb.store           # 登录接口跟着网站一起部署，无需单独配 Worker
   auth_endpoint: auth                    # 对应 functions/auth.js
