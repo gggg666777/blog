@@ -8,8 +8,10 @@
   {% if description %}<meta name="description" content="{{ description }}">{% endif %}
 
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✍️</text></svg>">
-  <link rel="stylesheet" href="/css/style.css">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="/feed.xml">
+
+  <!-- 样式直接内联：省掉一次网络往返（国内一次往返约 300~400ms） -->
+  <style>{% inlineCss %}</style>
 </head>
 <body>
   <div class="aurora" aria-hidden="true">

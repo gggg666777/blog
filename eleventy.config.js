@@ -1,9 +1,8 @@
 /**
  * Eleventy 配置
- *
- * 设计原则：这个生成器「只接管博客」，你现有的静态页面原样放进 src/ 即可，
- * 不需要重写、不需要迁移框架。
  */
+
+import { readFileSync } from "node:fs";
 
 const SHOW_DRAFTS = process.env.SHOW_DRAFTS === "1";
 
@@ -45,6 +44,13 @@ export default function (eleventyConfig) {
   eleventyConfig.addFilter("head", (arr, n) => (Array.isArray(arr) ? arr.slice(0, n) : []));
 
   eleventyConfig.addFilter("year", () => new Date().getFullYear());
+
+  /* ---------- 内联 CSS ---------- */
+  // 把样式表直接写进 HTML，省掉一次网络往返。
+  // 对国内访问提升明显：一次往返要 300~400ms，而样式表本身只有 2.7 KB。
+  eleventyConfig.addShortcode("inlineCss", () =>
+    readFileSync("src/css/style.css", "utf8")
+  );
 
   /* ---------- 目录结构 ---------- */
   return {
